@@ -1,0 +1,11 @@
+name: Economy
+version: '${version}'
+main: de.pqtriick.economy.Economy
+api-version: 1.16
+authors: [ pqtriick ]
+description: Simple Economy Plugin
+
+commands:
+  secohelp:
+    permission: seconomy.help
+  seco:
