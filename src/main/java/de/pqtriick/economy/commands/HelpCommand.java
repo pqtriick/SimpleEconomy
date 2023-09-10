@@ -29,6 +29,8 @@ public class HelpCommand implements CommandExecutor {
             player.sendMessage("§7» §6§o(Give your local money away to another player)");
             player.sendMessage("§7» §e/secohelp");
             player.sendMessage("§7» §6§o(Open this help page)");
+            player.sendMessage("§7» §e/reloadconfig");
+            player.sendMessage("§7» §6§o(Reload message and DB config)");
         }
         return false;
     }

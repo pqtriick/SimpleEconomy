@@ -38,6 +38,7 @@ public final class Economy extends JavaPlugin {
 
         this.getCommand("secohelp").setExecutor(new HelpCommand());
         this.getCommand("seco").setExecutor(new SimpleEconomy());
+        this.getCommand("reloadconfig");
         Bukkit.getPluginManager().registerEvents(new DBCheck(), this);
         Bukkit.getPluginManager().registerEvents(new ATMInteraction(), this);
         Bukkit.getPluginManager().registerEvents(new ATMChatInput(), this);
