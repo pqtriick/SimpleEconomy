@@ -14,5 +14,7 @@ import java.io.File;
 public class ConfigStorage {
     public static final File db = new File(Economy.getInstance().getDataFolder().getPath(), "databank.yml");
     public static final FileConfiguration dbConfig = YamlConfiguration.loadConfiguration(db);
+    public static final File msg = new File(Economy.getInstance().getDataFolder().getPath(), "messages.yml");
+    public static final FileConfiguration msgConfig = YamlConfiguration.loadConfiguration(msg);
 
 }

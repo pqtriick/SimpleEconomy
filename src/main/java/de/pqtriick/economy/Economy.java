@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static de.pqtriick.economy.files.ConfigStorage.dbConfig;
+import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
 import static de.pqtriick.economy.mysql.EconomySQL.createTable;
 import static de.pqtriick.economy.mysql.EconomySQL.loadDatabank;
 
@@ -58,6 +59,9 @@ public final class Economy extends JavaPlugin {
         Config.createFile(ConfigStorage.db);
         Config.setDefaults(dbConfig, ConfigStorage.db, "mysql.enabled", "new");
         ConfigValues.initdb();
+        Config.createFile(ConfigStorage.msg);
+        Config.setDefaults(msgConfig, ConfigStorage.msg, "messages.init", "new");
+        ConfigValues.initMsg();
     }
 
     private void initmaindb() {
