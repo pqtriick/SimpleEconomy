@@ -24,6 +24,7 @@ mysql:
 #### /seco info [Player] | See how much money the player has. (perm: seconomy.info)
 #### /seco pay [Player] [Amount] | Give your local money to somebody else.
 #### /secohelp | Opens the help page. (perm: seconomy.help)
+#### /reloadconfig | Reloads the config
 
 # Using the API
 
@@ -44,7 +45,11 @@ Economy.getApi().removeLocalmoney(UUID, Amount);
 Economy.getApi().getBankmoney(UUID);
 Economy.getApi().getLocalmoney(UUID);
 ```
+# Messages
 
+To edit the plugin messages, simply open the messages.yml file and edit them.
+IMPORTANT: You need to keep the placeholders like %bank_money% or the plugin can't recognize the input.
+IMPORTANT: Also reload the config with /reloadconfig !!
 Comming soon:
 - Saving Data in Config files
 - Language Support
