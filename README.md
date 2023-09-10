@@ -50,6 +50,8 @@ Economy.getApi().getLocalmoney(UUID);
 To edit the plugin messages, simply open the messages.yml file and edit them.
 IMPORTANT: You need to keep the placeholders like %bank_money% or the plugin can't recognize the input.
 IMPORTANT: Also reload the config with /reloadconfig !!
+
+
 Comming soon:
 - Saving Data in Config files
-- Language Support
+
