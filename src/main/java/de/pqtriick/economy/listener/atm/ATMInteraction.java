@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import static de.pqtriick.economy.files.ConfigStorage.msg;
+import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
 import static de.pqtriick.economy.util.Skull.CustomSkull.getCustomSkull;
 
 /**
@@ -33,9 +35,28 @@ public class ATMInteraction implements Listener {
     Inventory ATMStart;
     public static HashMap<Player, String> chatinput = new HashMap<>();
     private EconomySQL sql;
+    private static String UIDEPOSIT = msgConfig.getString("messages.atmuideposit");
+    private static String UIDEPOSITDESC = msgConfig.getString("messages.atmuidepositdesc");
+    private static String UIBALANCE = msgConfig.getString("messages.atmuibalance");
+    private static String UIBALANCEDESC = msgConfig.getString("messages.atmuibalancedesc");
+    private static String UIWITHDRAW = msgConfig.getString("messages.atmuiwithdraw");
+    private static String UIWITHDRAWDESC = msgConfig.getString("messages.atmuiwithdrawdesc");
+
+    private static String ATMPREFIX = msgConfig.getString("messages.atmprefix");
+    private static String ATMINPUT = msgConfig.getString("messages.atminput");
+    private static String ATMCANCEL = msgConfig.getString("messages.atmcancel");
+    private static String CURRENTBALANCE = msgConfig.getString("messages.currentbalance");
+
 
     @EventHandler
     public void onATMInteract(PlayerInteractEvent event) {
+        UIDEPOSIT = UIDEPOSIT.replace("&", "§");
+        UIDEPOSITDESC = UIDEPOSITDESC.replace("&", "§");
+        UIBALANCE = UIBALANCE.replace("&", "§");
+        UIBALANCEDESC = UIBALANCEDESC.replace("&", "§");
+        UIWITHDRAW = UIWITHDRAW.replace("&", "§");
+        UIWITHDRAWDESC = UIWITHDRAWDESC.replace("&", "§");
+
         Block clicked = event.getClickedBlock();
         Player p = event.getPlayer();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -46,9 +67,9 @@ public class ATMInteraction implements Listener {
                     for (int i = 0; i <= 11; i++) {
                         ATMStart.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").build());
                     }
-                    ATMStart.setItem(12, getCustomSkull(Skulls.ATM_INPUT.getTexture(), "§a§lDEPOSIT", "§eDeposit your local money"));
-                    ATMStart.setItem(13, getCustomSkull(Skulls.ATM_INFO.getTexture(), "§3§lBALANCE", "§eCheck your bank balance"));
-                    ATMStart.setItem(14, getCustomSkull(Skulls.ATM_OUTPUT.getTexture(), "§c§lWITHDRAW", "§eWithdraw money from your bank account"));
+                    ATMStart.setItem(12, getCustomSkull(Skulls.ATM_INPUT.getTexture(), UIDEPOSIT, UIDEPOSITDESC));
+                    ATMStart.setItem(13, getCustomSkull(Skulls.ATM_INFO.getTexture(), UIBALANCE, UIBALANCEDESC));
+                    ATMStart.setItem(14, getCustomSkull(Skulls.ATM_OUTPUT.getTexture(), UIWITHDRAW, UIWITHDRAWDESC));
                     for (int i = 15; i <= 26; i++) {
                         ATMStart.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("").build());
                     }
@@ -62,6 +83,9 @@ public class ATMInteraction implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
+        ATMPREFIX = ATMPREFIX.replace("&", "§");
+        ATMINPUT = ATMINPUT.replace("&", "§");
+        ATMCANCEL = ATMCANCEL.replace("&", "§");
         sql = new EconomySQL();
         Player player = (Player) event.getWhoClicked();
         if (event.getView().getTitle().equalsIgnoreCase("§6§lATM §7» §eChoose an action")) {
@@ -71,13 +95,15 @@ public class ATMInteraction implements Listener {
                     chatinput.remove(player);
                     chatinput.put(player, "INPUT");
                     player.closeInventory();
-                    player.sendMessage("§7[§cATM§7] §eType in the chat how much money you want to deposit §7(Without $)");
-                    player.sendMessage("§7[§cATM§7] §eTo cancel this process simply type §c'cancel' §eto cancel your action");
+                    player.sendMessage(ATMPREFIX + " " + ATMINPUT);
+                    player.sendMessage(ATMPREFIX + " " + ATMCANCEL);
                 }
                 if (event.getSlot() == 13) {
                     player.closeInventory();
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-                    player.sendMessage("§7[§cATM§7] §eYour current Balance: §2" + sql.getBankmoney(player.getUniqueId()) + "§2$");
+                    CURRENTBALANCE = CURRENTBALANCE.replace("&", "§");
+                    CURRENTBALANCE = CURRENTBALANCE.replace("%bank_money%", Integer.toString(sql.getBankmoney(player.getUniqueId())));
+                    player.sendMessage(ATMPREFIX + " " + CURRENTBALANCE);
                     player.sendMessage("§7[§cATM§7] §7" + dtf.format(LocalDateTime.now()));
                     player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER, 1, 1);
                 }
@@ -86,8 +112,8 @@ public class ATMInteraction implements Listener {
                 chatinput.remove(player);
                 chatinput.put(player, "WITHDRAW");
                 player.closeInventory();
-                player.sendMessage("§7[§cATM§7] §eType in the chat how much money you want to withdraw §7(Without $)");
-                player.sendMessage("§7[§cATM§7] §eTo cancel this process simply type §c'cancel' §eto cancel your action");
+                player.sendMessage(ATMPREFIX + " " + ATMINPUT);
+                player.sendMessage(ATMPREFIX + " " + ATMCANCEL);
             }
         }
     }

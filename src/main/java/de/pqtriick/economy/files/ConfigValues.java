@@ -23,7 +23,7 @@ public class ConfigValues {
     }
     public static void initMsg() {
         if (msgConfig.getString("messages.init").equals("new")) {
-            msgConfig.set("messages.init", null);
+            msgConfig.set("messages.init", "DONT CHANGE");
             msgConfig.set("messages.atmprefix", "&7[&cATM&7]");
             msgConfig.set("messages.nouser", "&7» &cUser could not be found.");
             msgConfig.set("messages.noperm","&7» &cYou don't have permission to use this command!");
@@ -32,17 +32,17 @@ public class ConfigValues {
             msgConfig.set("messages.moneyrecieved", "&7» &aYou recieved &2%paid_money%&2$ &afrom &e%player% !");
             msgConfig.set("messages.nomoney", "&7» &c You don't have so much money!");
             msgConfig.set("messages.paidtoself", "&7» &cYou can't pay to yourself!");
-            msgConfig.set("messages.local_balance", "&7» &eYour current local balance: &2%local_money% &2$");
+            msgConfig.set("messages.localbalance", "&7» &eYour current local balance: &2%local_money% &2$");
             msgConfig.set("messages.usage", "&7» &eUse &6/secohelp &efor more information");
             msgConfig.set("messages.playerinfotitle", "&7&m-----&7[&6&l %target%&6&ls &6Balance&7]&7&m-----");
-            msgConfig.set("messages.playerinfolocal", "&7» &Local balance: &2 %local_money% &2$");
-            msgConfig.set("messages.playerinfobank", "&7» &Local balance: &2 %bank_money% &2$");
+            msgConfig.set("messages.playerinfolocal", "&7» &eLocal balance: &2 %local_money% &2$");
+            msgConfig.set("messages.playerinfobank", "&7» &eBank balance: &2 %bank_money% &2$");
             msgConfig.set("messages.adminaddlocal", "&7» &aSucessfully added &2%amount%&2$ &ato &e%target%s &alocal balance!");
             msgConfig.set("messages.adminaddbank", "&7» &aSucessfully added &2%amount%&2$ &ato &e%target%s &abank balance!");
             msgConfig.set("messages.adminremovelocal", "&7» &aSucessfully removed &2%amount%&2$ &afrom &e%target%s &alocal balance!");
             msgConfig.set("messages.adminremovebank", "&7» &aSucessfully removed &2%amount%&2$ &afrom &e%target%s &abank balance!");
 
-            msgConfig.set("messages.atmcancel", "&7» §cSucessfully cancalled input.");
+            msgConfig.set("messages.atmcancelinput", "&7» §cSucessfully cancalled input.");
             msgConfig.set("messages.atmdeposit", "&a&lDEPOSIT &8| &2%amount%$");
             msgConfig.set("messages.atmwithdraw", "&c&lWITHDRAW &8| &2%amount%$");
             msgConfig.set("messages.atmuideposit", "&a&lDEPOSIT");

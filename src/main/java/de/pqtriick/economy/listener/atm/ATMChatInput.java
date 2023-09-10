@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
+
 /**
  * @author pqtriick_
  * @created 01:53, 05.09.2023
@@ -15,9 +17,19 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 public class ATMChatInput implements Listener {
 
     private EconomySQL sql;
+    private static String ATMPREFIX = msgConfig.getString("messages.atmprefix");
+    private static String ATMCANCELINPUT = msgConfig.getString("messages.atmcancelinput");
+    private static String DEPOSITSUCESS = msgConfig.getString("messages.atmdeposit");
+    private static String NOMONEY = msgConfig.getString("messages.nomoney");
+    private static String WRONGINPUT = msgConfig.getString("messages.wronginput");
+    private static String WITHDRAWSUCESS = msgConfig.getString("messages.atmwithdraw");
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        ATMPREFIX = ATMPREFIX.replace("&", "§");
+        NOMONEY = NOMONEY.replace("&", "§");
+        WRONGINPUT = WRONGINPUT.replace("&", "§");
+
         sql = new EconomySQL();
         Player player = event.getPlayer();
         if (ATMInteraction.chatinput.get(player).equals("INPUT")) {
@@ -25,21 +37,24 @@ public class ATMChatInput implements Listener {
             String message = event.getMessage();
             if (message.equalsIgnoreCase("cancel")) {
                 ATMInteraction.chatinput.remove(player);
-                player.sendMessage("§7[§cATM§7] §cSucessfully cancelled input.");
+                ATMCANCELINPUT = ATMCANCELINPUT.replace("&", "§");
+                player.sendMessage(ATMPREFIX + " " + ATMCANCELINPUT);
             } else {
                 try {
                     int amount = Integer.parseInt(message);
                     if (sql.getLocalmoney(player.getUniqueId()) >= amount) {
                         sql.removeLocalmoney(player.getUniqueId(), amount);
                         sql.addBankmoney(player.getUniqueId(), amount);
-                        player.sendMessage("§7[§cATM§7] §a§lDEPOSIT §8| §2+ " + amount + "§2$");
+                        DEPOSITSUCESS = DEPOSITSUCESS.replace("&", "§");
+                        DEPOSITSUCESS = DEPOSITSUCESS.replace("%amount%", Integer.toString(amount));
+                        player.sendMessage(ATMPREFIX + " " + DEPOSITSUCESS);
                         ATMInteraction.chatinput.remove(player);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
                     } else {
-                        player.sendMessage("§7[§cATM§7] §cYou don't have so much money!");
+                        player.sendMessage(ATMPREFIX + " " + NOMONEY);
                     }
                 } catch (Exception e) {
-                    player.sendMessage("§7[§cATM§7] §cWrite an actual number!");
+                    player.sendMessage(ATMPREFIX + " " + WRONGINPUT);
                 }
             }
         } else if (ATMInteraction.chatinput.get(player).equals("WITHDRAW")) {
@@ -47,21 +62,23 @@ public class ATMChatInput implements Listener {
             String message = event.getMessage();
             if (message.equalsIgnoreCase("cancel")) {
                 ATMInteraction.chatinput.remove(player);
-                player.sendMessage("§7[§cATM§7] §cSucessfully cancelled input.");
+                player.sendMessage(ATMPREFIX + " " + ATMCANCELINPUT);
             } else {
                 try {
                     int amount = Integer.parseInt(message);
                     if (sql.getBankmoney(player.getUniqueId()) >= amount) {
                         sql.removeBankmoney(player.getUniqueId(), amount);
                         sql.addLocalmoney(player.getUniqueId(), amount);
-                        player.sendMessage("§7[§cATM§7] §c§lWITHDRAW §8| §2+ " + amount + "§2$");
+                        WITHDRAWSUCESS = WITHDRAWSUCESS.replace("&", "§");
+                        WITHDRAWSUCESS = WITHDRAWSUCESS.replace("%amount%", Integer.toString(amount));
+                        player.sendMessage(ATMPREFIX + " " + WITHDRAWSUCESS);
                         ATMInteraction.chatinput.remove(player);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
                     } else {
-                        player.sendMessage("§7[§cATM§7] §cYou don't have so much money!");
+                        player.sendMessage(ATMPREFIX + " " + NOMONEY);
                     }
                 } catch (Exception e) {
-                    player.sendMessage("§7[§cATM§7] §cWrite an actual number!");
+                    player.sendMessage(ATMPREFIX + " " + WRONGINPUT);
                 }
             }
 
