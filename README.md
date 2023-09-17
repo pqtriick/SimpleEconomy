@@ -2,7 +2,7 @@
 
 A simple economy plugin with MySQL support and inbuilt API
 
-# MySQL Config (Currently only MySQL Support :/)
+# MySQL Config
 ```
 mysql:
   enabled: 'TRUE'
@@ -12,6 +12,18 @@ mysql:
   databank: DB
   autoreconnect: 'FALSE'
 ```
+#Normal Config Example(Without MySQL Support)
+
+```
+info:
+  enabled: 'TRUE'
+user:
+  uuid:
+    localmoney: '0'
+    bankmoney: '0'
+
+```
+
 # Video
 
 ![](https://github.com/pqtriick/SimpleEconomy/blob/master/ezgif.com-video-to-gif%20(1).gif)
@@ -52,6 +64,5 @@ IMPORTANT: You need to keep the placeholders like %bank_money% or the plugin can
 IMPORTANT: Also reload the config with /reloadconfig !!
 
 
-Comming soon:
-- Saving Data in Config files
+
 
