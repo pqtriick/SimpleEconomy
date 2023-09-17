@@ -23,7 +23,7 @@ public class ReloadConfig implements CommandExecutor {
                 Config.saveFile(ConfigStorage.dbConfig, ConfigStorage.db);
                 Config.saveFile(ConfigStorage.msgConfig, ConfigStorage.msg);
                 Config.saveFile(ConfigStorage.userdataConfig, ConfigStorage.userData);
-                p.sendMessage("§aSucessfully reloaded §bdatabank.yml & messages.yml");
+                p.sendMessage("§aSucessfully reloaded §bdatabank.yml, messages.yml & userdata.yml");
             } catch (Exception e) {
                 p.sendMessage("§cAn error occured, view the console for more information.");
                 System.out.println(e);
