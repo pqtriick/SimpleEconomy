@@ -12,7 +12,7 @@ mysql:
   databank: DB
   autoreconnect: 'FALSE'
 ```
-#Normal Config Example(Without MySQL Support)
+# Normal Config Example(Without MySQL Support)
 
 ```
 info:
@@ -21,7 +21,6 @@ user:
   uuid:
     localmoney: '0'
     bankmoney: '0'
-
 ```
 
 # Video
