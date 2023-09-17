@@ -1,5 +1,6 @@
 package de.pqtriick.economy.listener.player;
 
+import de.pqtriick.economy.files.ConfigStorage;
 import de.pqtriick.economy.listener.atm.ATMInteraction;
 import de.pqtriick.economy.mysql.EconomySQL;
 import org.bukkit.entity.Player;
@@ -19,10 +20,16 @@ public class DBCheck implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        sql = new EconomySQL();
         Player p = event.getPlayer();
-        if (!sql.userExits(p.getUniqueId())) {
-            sql.createUser(p.getUniqueId());
+        if (ConfigStorage.dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+            sql = new EconomySQL();
+            if (!sql.userExits(p.getUniqueId())) {
+                sql.createUser(p.getUniqueId());
+            }
+        } else if (ConfigStorage.userdataConfig.getString("user." + p.getUniqueId())  == null) {
+            ConfigStorage.userdataConfig.set("user." + p.getUniqueId() + ".localmoney", "0");
+            ConfigStorage.userdataConfig.set("user." + p.getUniqueId() + ".bankmoney", "0");
+
         }
     }
 

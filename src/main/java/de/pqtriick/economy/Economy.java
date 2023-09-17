@@ -3,6 +3,7 @@ package de.pqtriick.economy;
 import de.pqtriick.economy.api.EconomyAPI;
 import de.pqtriick.economy.api.IEconomyAPI;
 import de.pqtriick.economy.commands.HelpCommand;
+import de.pqtriick.economy.commands.ReloadConfig;
 import de.pqtriick.economy.commands.SimpleEconomy;
 import de.pqtriick.economy.files.Config;
 import de.pqtriick.economy.files.ConfigStorage;
@@ -13,10 +14,10 @@ import de.pqtriick.economy.listener.player.DBCheck;
 import de.pqtriick.economy.mysql.EconomySQL;
 import de.pqtriick.economy.mysql.MySQL;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import static de.pqtriick.economy.files.ConfigStorage.dbConfig;
-import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
+import static de.pqtriick.economy.files.ConfigStorage.*;
 import static de.pqtriick.economy.mysql.EconomySQL.createTable;
 import static de.pqtriick.economy.mysql.EconomySQL.loadDatabank;
 
@@ -38,7 +39,7 @@ public final class Economy extends JavaPlugin {
 
         this.getCommand("secohelp").setExecutor(new HelpCommand());
         this.getCommand("seco").setExecutor(new SimpleEconomy());
-        this.getCommand("reloadconfig");
+        this.getCommand("reloadconfig").setExecutor(new ReloadConfig());
         Bukkit.getPluginManager().registerEvents(new DBCheck(), this);
         Bukkit.getPluginManager().registerEvents(new ATMInteraction(), this);
         Bukkit.getPluginManager().registerEvents(new ATMChatInput(), this);
@@ -63,6 +64,9 @@ public final class Economy extends JavaPlugin {
         Config.createFile(ConfigStorage.msg);
         Config.setDefaults(msgConfig, ConfigStorage.msg, "messages.init", "new");
         ConfigValues.initMsg();
+        Config.createFile(ConfigStorage.userData);
+        Config.setDefaults(userdataConfig, userData, "info.enabled", "new");
+        ConfigValues.initUserCfg();
     }
 
     private void initmaindb() {
@@ -70,4 +74,5 @@ public final class Economy extends JavaPlugin {
         createTable();
 
     }
+
 }

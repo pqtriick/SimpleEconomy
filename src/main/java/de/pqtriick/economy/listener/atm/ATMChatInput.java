@@ -1,5 +1,7 @@
 package de.pqtriick.economy.listener.atm;
 
+import de.pqtriick.economy.files.Config;
+import de.pqtriick.economy.files.UserData;
 import de.pqtriick.economy.mysql.EconomySQL;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -7,7 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
+import static de.pqtriick.economy.files.ConfigStorage.*;
 
 /**
  * @author pqtriick_
@@ -42,21 +44,37 @@ public class ATMChatInput implements Listener {
             } else {
                 try {
                     int amount = Integer.parseInt(message);
-                    if (sql.getLocalmoney(player.getUniqueId()) >= amount) {
-                        sql.removeLocalmoney(player.getUniqueId(), amount);
-                        sql.addBankmoney(player.getUniqueId(), amount);
-                        DEPOSITSUCESS = DEPOSITSUCESS.replace("&", "§");
-                        DEPOSITSUCESS = DEPOSITSUCESS.replace("%amount%", Integer.toString(amount));
-                        player.sendMessage(ATMPREFIX + " " + DEPOSITSUCESS);
-                        ATMInteraction.chatinput.remove(player);
-                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                    if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                        if (sql.getLocalmoney(player.getUniqueId()) >= amount) {
+                            sql.removeLocalmoney(player.getUniqueId(), amount);
+                            sql.addBankmoney(player.getUniqueId(), amount);
+                            DEPOSITSUCESS = DEPOSITSUCESS.replace("&", "§");
+                            DEPOSITSUCESS = DEPOSITSUCESS.replace("%amount%", Integer.toString(amount));
+                            player.sendMessage(ATMPREFIX + " " + DEPOSITSUCESS);
+                            ATMInteraction.chatinput.remove(player);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                        } else {
+                            player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        }
                     } else {
-                        player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        if (UserData.getLocalmoney(player) >= amount) {
+                            UserData.removeLocalmoney(player, amount);
+                            UserData.addBankmoney(player, amount);
+                            Config.saveFile(userdataConfig, userData);
+                            DEPOSITSUCESS = DEPOSITSUCESS.replace("&", "§");
+                            DEPOSITSUCESS = DEPOSITSUCESS.replace("%amount%", Integer.toString(amount));
+                            player.sendMessage(ATMPREFIX + " " + DEPOSITSUCESS);
+                            ATMInteraction.chatinput.remove(player);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                        } else {
+                            player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        }
                     }
                 } catch (Exception e) {
                     player.sendMessage(ATMPREFIX + " " + WRONGINPUT);
                 }
             }
+
         } else if (ATMInteraction.chatinput.get(player).equals("WITHDRAW")) {
             event.setCancelled(true);
             String message = event.getMessage();
@@ -66,16 +84,31 @@ public class ATMChatInput implements Listener {
             } else {
                 try {
                     int amount = Integer.parseInt(message);
-                    if (sql.getBankmoney(player.getUniqueId()) >= amount) {
-                        sql.removeBankmoney(player.getUniqueId(), amount);
-                        sql.addLocalmoney(player.getUniqueId(), amount);
-                        WITHDRAWSUCESS = WITHDRAWSUCESS.replace("&", "§");
-                        WITHDRAWSUCESS = WITHDRAWSUCESS.replace("%amount%", Integer.toString(amount));
-                        player.sendMessage(ATMPREFIX + " " + WITHDRAWSUCESS);
-                        ATMInteraction.chatinput.remove(player);
-                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                    if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                        if (sql.getBankmoney(player.getUniqueId()) >= amount) {
+                            sql.removeBankmoney(player.getUniqueId(), amount);
+                            sql.addLocalmoney(player.getUniqueId(), amount);
+                            WITHDRAWSUCESS = WITHDRAWSUCESS.replace("&", "§");
+                            WITHDRAWSUCESS = WITHDRAWSUCESS.replace("%amount%", Integer.toString(amount));
+                            player.sendMessage(ATMPREFIX + " " + WITHDRAWSUCESS);
+                            ATMInteraction.chatinput.remove(player);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                        } else {
+                            player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        }
                     } else {
-                        player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        if (UserData.getBankmoney(player) >= amount) {
+                            UserData.removeBankmoney(player, amount);
+                            UserData.addLocalmoney(player, amount);
+                            Config.saveFile(userdataConfig, userData);
+                            WITHDRAWSUCESS = WITHDRAWSUCESS.replace("&", "§");
+                            WITHDRAWSUCESS = WITHDRAWSUCESS.replace("%amount%", Integer.toString(amount));
+                            player.sendMessage(ATMPREFIX + " " + WITHDRAWSUCESS);
+                            ATMInteraction.chatinput.remove(player);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 2);
+                        } else {
+                            player.sendMessage(ATMPREFIX + " " + NOMONEY);
+                        }
                     }
                 } catch (Exception e) {
                     player.sendMessage(ATMPREFIX + " " + WRONGINPUT);

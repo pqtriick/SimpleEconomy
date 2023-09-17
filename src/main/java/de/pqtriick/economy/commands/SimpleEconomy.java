@@ -1,5 +1,8 @@
 package de.pqtriick.economy.commands;
 
+import com.mojang.authlib.yggdrasil.response.User;
+import de.pqtriick.economy.files.Config;
+import de.pqtriick.economy.files.UserData;
 import de.pqtriick.economy.mysql.EconomySQL;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -43,7 +46,12 @@ public class SimpleEconomy implements CommandExecutor {
         Player p = (Player) sender;
         if (args.length==0) {
             LOCALBALANCE = LOCALBALANCE.replace("&", "§");
-            LOCALBALANCE = LOCALBALANCE.replace("%local_money%", Integer.toString(sql.getLocalmoney(p.getUniqueId())));
+            if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                LOCALBALANCE = LOCALBALANCE.replace("%local_money%", Integer.toString(sql.getLocalmoney(p.getUniqueId())));
+            } else {
+                LOCALBALANCE = LOCALBALANCE.replace("%local_money%", Integer.toString(UserData.getLocalmoney(p)));
+
+            }
             p.sendMessage(LOCALBALANCE);
         }
         else if (args.length==1) {
@@ -59,10 +67,18 @@ public class SimpleEconomy implements CommandExecutor {
                         p.sendMessage(INFOTITLE);
                         p.sendMessage("");
                         BANKINFOBALANCE = BANKINFOBALANCE.replace("&", "§");
-                        BANKINFOBALANCE = BANKINFOBALANCE.replace("%bank_money%", Integer.toString(sql.getBankmoney(target.getUniqueId())));
+                        if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                            BANKINFOBALANCE = BANKINFOBALANCE.replace("%bank_money%", Integer.toString(sql.getBankmoney(target.getUniqueId())));
+                        } else {
+                            BANKINFOBALANCE = BANKINFOBALANCE.replace("%bank_money%", Integer.toString(UserData.getBankmoney(target)));
+                        }
                         p.sendMessage(BANKINFOBALANCE);
                         LOCALINFOBALANCE = LOCALINFOBALANCE.replace("&", "§");
-                        LOCALINFOBALANCE = LOCALINFOBALANCE.replace("%local_money%", Integer.toString(sql.getLocalmoney(target.getUniqueId())));
+                        if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                            LOCALINFOBALANCE = LOCALINFOBALANCE.replace("%local_money%", Integer.toString(sql.getLocalmoney(target.getUniqueId())));
+                        } else {
+                            LOCALINFOBALANCE = LOCALINFOBALANCE.replace("%local_money%", Integer.toString(UserData.getLocalmoney(target)));
+                        }
                         p.sendMessage(LOCALINFOBALANCE);
                     } else {
                         p.sendMessage(NOUSER);
@@ -80,33 +96,62 @@ public class SimpleEconomy implements CommandExecutor {
                 } catch (Exception x) {
                     p.sendMessage(WRONGINPUT);
                 }
-                if (sql.userExits(target.getUniqueId())) {
-                    if (p != target) {
-                        if (sql.getLocalmoney(p.getUniqueId()) >= amount) {
-                            sql.removeLocalmoney(p.getUniqueId(), amount);
-                            sql.addLocalmoney(target.getUniqueId(), amount);
-                            PAYTOUSER = PAYTOUSER.replace("&", "§");
-                            PAYTOUSER = PAYTOUSER.replace("%paid_money%", Integer.toString(amount));
-                            PAYTOUSER = PAYTOUSER.replace("%target", target.getName());
-                            p.sendMessage(PAYTOUSER);
-                            MONEYRECIEVE = MONEYRECIEVE.replace("&", "§");
-                            MONEYRECIEVE = MONEYRECIEVE.replace("%paid_money%", Integer.toString(amount));
-                            MONEYRECIEVE = MONEYRECIEVE.replace("%player%", p.getName());
-                            target.sendMessage(MONEYRECIEVE);
-                        } else {
-                            NOMONEY = NOMONEY.replace("&", "§");
-                            p.sendMessage(NOMONEY);
-                        }
+                if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                    if (sql.userExits(target.getUniqueId())) {
+                        if (p != target) {
+                            if (sql.getLocalmoney(p.getUniqueId()) >= amount) {
+                                sql.removeLocalmoney(p.getUniqueId(), amount);
+                                sql.addLocalmoney(target.getUniqueId(), amount);
+                                PAYTOUSER = PAYTOUSER.replace("&", "§");
+                                PAYTOUSER = PAYTOUSER.replace("%paid_money%", Integer.toString(amount));
+                                PAYTOUSER = PAYTOUSER.replace("%target", target.getName());
+                                p.sendMessage(PAYTOUSER);
+                                MONEYRECIEVE = MONEYRECIEVE.replace("&", "§");
+                                MONEYRECIEVE = MONEYRECIEVE.replace("%paid_money%", Integer.toString(amount));
+                                MONEYRECIEVE = MONEYRECIEVE.replace("%player%", p.getName());
+                                target.sendMessage(MONEYRECIEVE);
+                            } else {
+                                NOMONEY = NOMONEY.replace("&", "§");
+                                p.sendMessage(NOMONEY);
+                            }
 
+                        } else {
+                            NOPAYTOSELF = NOPAYTOSELF.replace("&", "§");
+                            p.sendMessage(NOPAYTOSELF);
+                        }
                     } else {
-                        NOPAYTOSELF = NOPAYTOSELF.replace("&", "§");
-                        p.sendMessage(NOPAYTOSELF);
+                        p.sendMessage(NOUSER);
                     }
                 } else {
-                    p.sendMessage(NOUSER);
+                    if (UserData.userExists(target)) {
+                        if (p != target) {
+                            if (UserData.getLocalmoney(p) >= amount) {
+                                UserData.removeLocalmoney(p, amount);
+                                UserData.addLocalmoney(target, amount);
+                                PAYTOUSER = PAYTOUSER.replace("&", "§");
+                                PAYTOUSER = PAYTOUSER.replace("%paid_money%", Integer.toString(amount));
+                                PAYTOUSER = PAYTOUSER.replace("%target", target.getName());
+                                Config.saveFile(userdataConfig, userData);
+                                p.sendMessage(PAYTOUSER);
+                                MONEYRECIEVE = MONEYRECIEVE.replace("&", "§");
+                                MONEYRECIEVE = MONEYRECIEVE.replace("%paid_money%", Integer.toString(amount));
+                                MONEYRECIEVE = MONEYRECIEVE.replace("%player%", p.getName());
+                                Config.saveFile(userdataConfig, userData);
+                                target.sendMessage(MONEYRECIEVE);
+                            } else {
+                                NOMONEY = NOMONEY.replace("&", "§");
+                                p.sendMessage(NOMONEY);
+                            }
+
+                        } else {
+                            NOPAYTOSELF = NOPAYTOSELF.replace("&", "§");
+                            p.sendMessage(NOPAYTOSELF);
+                        }
+                    } else {
+                        p.sendMessage(NOUSER);
+                    }
                 }
             }
-
         } else if (args.length==4) {
             if (args[0].equalsIgnoreCase("add")) {
                 if (p.hasPermission("seconomy.add")) {
@@ -117,20 +162,41 @@ public class SimpleEconomy implements CommandExecutor {
                     } catch (Exception x) {
                         p.sendMessage(WRONGINPUT);
                     }
-                    if (sql.userExits(target.getUniqueId())) {
-                        if (args[2].equalsIgnoreCase("Bank")) {
-                            sql.addBankmoney(target.getUniqueId(), amount);
-                            ADDBANKBAL = ADDBANKBAL.replace("&", "§");
-                            ADDBANKBAL = ADDBANKBAL.replace("%target%", target.getName());
-                            ADDBANKBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
-                            p.sendMessage(ADDBANKBAL);
+                    if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                        if (sql.userExits(target.getUniqueId())) {
+                            if (args[2].equalsIgnoreCase("Bank")) {
+                                sql.addBankmoney(target.getUniqueId(), amount);
+                                ADDBANKBAL = ADDBANKBAL.replace("&", "§");
+                                ADDBANKBAL = ADDBANKBAL.replace("%target%", target.getName());
+                                ADDBANKBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
+                                p.sendMessage(ADDBANKBAL);
+                            }
+                            if (args[2].equalsIgnoreCase("Local")) {
+                                sql.addLocalmoney(target.getUniqueId(), amount);
+                                ADDLOCALBAL = ADDBANKBAL.replace("&", "§");
+                                ADDLOCALBAL = ADDBANKBAL.replace("%target%", target.getName());
+                                ADDLOCALBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
+                                p.sendMessage(ADDLOCALBAL);
+                            }
                         }
-                        if (args[2].equalsIgnoreCase("Local")) {
-                            sql.addLocalmoney(target.getUniqueId(), amount);
-                            ADDLOCALBAL = ADDBANKBAL.replace("&", "§");
-                            ADDLOCALBAL = ADDBANKBAL.replace("%target%", target.getName());
-                            ADDLOCALBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
-                            p.sendMessage(ADDLOCALBAL);
+                    } else {
+                        if (UserData.userExists(target)) {
+                            if (args[2].equalsIgnoreCase("Bank")) {
+                                UserData.addBankmoney(target, amount);
+                                ADDBANKBAL = ADDBANKBAL.replace("&", "§");
+                                ADDBANKBAL = ADDBANKBAL.replace("%target%", target.getName());
+                                ADDBANKBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
+                                Config.saveFile(userdataConfig, userData);
+                                p.sendMessage(ADDBANKBAL);
+                            }
+                            if (args[2].equalsIgnoreCase("Local")) {
+                                sql.addLocalmoney(target.getUniqueId(), amount);
+                                ADDLOCALBAL = ADDBANKBAL.replace("&", "§");
+                                ADDLOCALBAL = ADDBANKBAL.replace("%target%", target.getName());
+                                ADDLOCALBAL = ADDBANKBAL.replace("%amount%", Integer.toString(amount));
+                                Config.saveFile(userdataConfig, userData);
+                                p.sendMessage(ADDLOCALBAL);
+                            }
                         }
                     }
                 }
@@ -144,20 +210,41 @@ public class SimpleEconomy implements CommandExecutor {
                     } catch (Exception x) {
                         p.sendMessage(WRONGINPUT);
                     }
-                    if (sql.userExits(target.getUniqueId())) {
-                        if (args[2].equalsIgnoreCase("Bank")) {
-                            sql.removeBankmoney(target.getUniqueId(), amount);
-                            REMOVEBANKBAL = REMOVEBANKBAL.replace("&", "§");
-                            REMOVEBANKBAL = REMOVEBANKBAL.replace("%target%", target.getName());
-                            REMOVEBANKBAL = REMOVEBANKBAL.replace("%amount%", Integer.toString(amount));
-                            p.sendMessage(REMOVEBANKBAL);
+                    if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                        if (sql.userExits(target.getUniqueId())) {
+                            if (args[2].equalsIgnoreCase("Bank")) {
+                                sql.removeBankmoney(target.getUniqueId(), amount);
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("&", "§");
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("%target%", target.getName());
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("%amount%", Integer.toString(amount));
+                                p.sendMessage(REMOVEBANKBAL);
+                            }
+                            if (args[2].equalsIgnoreCase("Local")) {
+                                sql.removeLocalmoney(target.getUniqueId(), amount);
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("&", "§");
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("%target%", target.getName());
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("%amount%", Integer.toString(amount));
+                                p.sendMessage(REMOVELOCALBAL);
+                            }
                         }
-                        if (args[2].equalsIgnoreCase("Local")) {
-                            sql.removeLocalmoney(target.getUniqueId(), amount);
-                            REMOVELOCALBAL = REMOVELOCALBAL.replace("&", "§");
-                            REMOVELOCALBAL = REMOVELOCALBAL.replace("%target%", target.getName());
-                            REMOVELOCALBAL = REMOVELOCALBAL.replace("%amount%", Integer.toString(amount));
-                            p.sendMessage(REMOVELOCALBAL);
+                    } else {
+                        if (UserData.userExists(target)) {
+                            if (args[2].equalsIgnoreCase("Bank")) {
+                                UserData.removeBankmoney(target, amount);
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("&", "§");
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("%target%", target.getName());
+                                REMOVEBANKBAL = REMOVEBANKBAL.replace("%amount%", Integer.toString(amount));
+                                Config.saveFile(userdataConfig, userData);
+                                p.sendMessage(REMOVEBANKBAL);
+                            }
+                            if (args[2].equalsIgnoreCase("Local")) {
+                                UserData.removeLocalmoney(target, amount);
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("&", "§");
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("%target%", target.getName());
+                                REMOVELOCALBAL = REMOVELOCALBAL.replace("%amount%", Integer.toString(amount));
+                                Config.saveFile(userdataConfig, userData);
+                                p.sendMessage(REMOVELOCALBAL);
+                            }
                         }
                     }
                 }

@@ -16,5 +16,7 @@ public class ConfigStorage {
     public static final FileConfiguration dbConfig = YamlConfiguration.loadConfiguration(db);
     public static final File msg = new File(Economy.getInstance().getDataFolder().getPath(), "messages.yml");
     public static final FileConfiguration msgConfig = YamlConfiguration.loadConfiguration(msg);
+    public static final File userData = new File(Economy.getInstance().getDataFolder().getPath(), "userdata.yml");
+    public static final FileConfiguration userdataConfig = YamlConfiguration.loadConfiguration(userData);
 
 }

@@ -1,5 +1,6 @@
 package de.pqtriick.economy.listener.atm;
 
+import de.pqtriick.economy.files.UserData;
 import de.pqtriick.economy.mysql.EconomySQL;
 import de.pqtriick.economy.util.ItemBuilder;
 import de.pqtriick.economy.util.Skull.Skulls;
@@ -13,16 +14,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-import static de.pqtriick.economy.files.ConfigStorage.msg;
-import static de.pqtriick.economy.files.ConfigStorage.msgConfig;
+import static de.pqtriick.economy.files.ConfigStorage.*;
 import static de.pqtriick.economy.util.Skull.CustomSkull.getCustomSkull;
 
 /**
@@ -102,7 +105,11 @@ public class ATMInteraction implements Listener {
                     player.closeInventory();
                     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
                     CURRENTBALANCE = CURRENTBALANCE.replace("&", "§");
-                    CURRENTBALANCE = CURRENTBALANCE.replace("%bank_money%", Integer.toString(sql.getBankmoney(player.getUniqueId())));
+                    if (dbConfig.getString("mysql.enabled").equalsIgnoreCase("TRUE")) {
+                        CURRENTBALANCE = CURRENTBALANCE.replace("%bank_money%", Integer.toString(sql.getBankmoney(player.getUniqueId())));
+                    } else {
+                        CURRENTBALANCE = CURRENTBALANCE.replace("%bank_money%", Integer.toString(UserData.getBankmoney(player)));
+                    }
                     player.sendMessage(ATMPREFIX + " " + CURRENTBALANCE);
                     player.sendMessage("§7[§cATM§7] §7" + dtf.format(LocalDateTime.now()));
                     player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_WORK_CARTOGRAPHER, 1, 1);
@@ -117,6 +124,7 @@ public class ATMInteraction implements Listener {
             }
         }
     }
+
 }
 
 

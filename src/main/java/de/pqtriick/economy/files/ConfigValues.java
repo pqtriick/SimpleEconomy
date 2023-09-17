@@ -19,8 +19,8 @@ public class ConfigValues {
             dbConfig.set("mysql.enabled", null);
             Config.saveFile(dbConfig, db);
         }
-
     }
+
     public static void initMsg() {
         if (msgConfig.getString("messages.init").equals("new")) {
             msgConfig.set("messages.init", "DONT CHANGE");
@@ -41,7 +41,6 @@ public class ConfigValues {
             msgConfig.set("messages.adminaddbank", "&7» &aSucessfully added &2%amount%&2$ &ato &e%target%s &abank balance!");
             msgConfig.set("messages.adminremovelocal", "&7» &aSucessfully removed &2%amount%&2$ &afrom &e%target%s &alocal balance!");
             msgConfig.set("messages.adminremovebank", "&7» &aSucessfully removed &2%amount%&2$ &afrom &e%target%s &abank balance!");
-
             msgConfig.set("messages.atmcancelinput", "&7» §cSucessfully cancalled input.");
             msgConfig.set("messages.atmdeposit", "&a&lDEPOSIT &8| &2%amount%$");
             msgConfig.set("messages.atmwithdraw", "&c&lWITHDRAW &8| &2%amount%$");
@@ -55,6 +54,14 @@ public class ConfigValues {
             msgConfig.set("messages.atminput", "&eType in the chat how much money you want to deposit/withdraw &7(Without $)");
             msgConfig.set("messages.currentbalance", "&eYour current balance: &2%bank_money%&2$");
             Config.saveFile(msgConfig, msg);
+        }
+    }
+
+    public static void initUserCfg() {
+        if (userdataConfig.getString("info.enabled").equals("new")) {
+            userdataConfig.set("info.enabled", "FALSE");
+            Config.saveFile(userdataConfig, userData);
+
         }
     }
 
